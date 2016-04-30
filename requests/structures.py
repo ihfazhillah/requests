@@ -51,6 +51,7 @@ class CaseInsensitiveDict(collections.MutableMapping):
         self._store[key.lower()] = (key, value)
 
     def __getitem__(self, key):
+        # -= actual value is in tuple number 1
         return self._store[key.lower()][1]
 
     def __delitem__(self, key):
