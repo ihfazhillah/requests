@@ -442,6 +442,9 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
             content_type = 'application/json'
             body = complexjson.dumps(json)
 
+        # -= another trick, using all builtin function instead using
+        # -= complex / nested conditional
+
         is_stream = all([
             hasattr(data, '__iter__'),
             not isinstance(data, (basestring, list, tuple, dict))
