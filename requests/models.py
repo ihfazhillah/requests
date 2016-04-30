@@ -311,6 +311,15 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
         p = PreparedRequest()
         p.method = self.method
         p.url = self.url
+        # -= self.headers.copy(), method copy bukan dari method ini
+        # -= akan tetapi diambil dari objek dictionary
+        # -= method copy refrensi antara ini dan itu sama
+        # -= misal: a = {1:[1,2,3]}
+        # -= b = a.copy()
+        # -= maka, ketika kita tambah val ke a[1].append(5) maka
+        # -= a == b
+        # -= berbeda dengan c = copy.deepcopy(b), maka ketika
+        # -= ada perubahan di b, c != b
         p.headers = self.headers.copy() if self.headers is not None else None
         p._cookies = _copy_cookie_jar(self._cookies)
         p.body = self.body
@@ -333,6 +342,9 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
         if isinstance(url, bytes):
             url = url.decode('utf8')
         else:
+            # -= dia gunakan is_py2 untuk mudah dibaca
+            # -= dengan ini, kita tahu apa yang terjadi disini 
+            # -= secara mudah
             url = unicode(url) if is_py2 else str(url)
 
         # Don't do any URL preparation for non-HTTP schemes like `mailto`,
@@ -340,6 +352,10 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
         # handles RFC 3986 only.
         if ':' in url and not url.lower().startswith('http'):
             self.url = url
+            # -= ini artinya mereturn None
+            # -= atau mungkin bisa digunakan untuk break/ keluar
+            # -= dari fungsi ketika kondisi ini ditemukan
+            # -= http://stackoverflow.com/questions/15300550/python-return-return-none-and-no-return-at-all
             return
 
         # Support for unicode domain names and paths.
@@ -349,6 +365,9 @@ class PreparedRequest(RequestEncodingMixin, RequestHooksMixin):
             raise InvalidURL(*e.args)
 
         if not scheme:
+            # -= !r merupakan specifier yang digunakan untuk mendeklarasikan bhwa
+            # -= ini adalah format repr
+            # -= mis: "{!r}".format("a") return "'a'"
             error = ("Invalid URL {0!r}: No schema supplied. Perhaps you meant http://{0}?")
             error = error.format(to_native_string(url, 'utf8'))
 
